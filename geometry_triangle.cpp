@@ -2,9 +2,9 @@
 // Created by lurker on 5/12/17.
 //
 
-#include "geometry.h"
+#include "geometry_triangle.h"
 
-geometry::geometry() {
+geometry_triangle::geometry_triangle() {
     /*
      * initialize all information on meta.
      *
@@ -43,7 +43,7 @@ geometry::geometry() {
     _meta.neighborlist = nullptr;
 }
 
-geometry::~geometry() {
+geometry_triangle::~geometry_triangle() {
     /*
      * release all information of the pointers.
      *
@@ -68,7 +68,7 @@ geometry::~geometry() {
     trifree((void *) _meta.neighborlist);
 }
 
-void geometry::set_points(Array<double> &_points) {
+void geometry_triangle::set_points(Array<double> &_points) {
     auto len = _points.get_size();
     assert(len % 2 == 0);
     _meta.pointlist = (double *) malloc(len * sizeof(double));
@@ -78,7 +78,7 @@ void geometry::set_points(Array<double> &_points) {
 
 }
 
-void geometry::set_facets(Array<int> &_facets) {
+void geometry_triangle::set_facets(Array<int> &_facets) {
     auto len = _facets.get_size();
     assert(len % 2 == 0);
     _meta.segmentlist = (int *) malloc(len * sizeof(int));
@@ -87,52 +87,54 @@ void geometry::set_facets(Array<int> &_facets) {
     memcpy(_meta.segmentlist, _facets.get_data(), len * sizeof(int));
 }
 
-void geometry::build(std::string switches, geometry &out) {
-    geometry vor;
+void geometry_triangle::build(std::string switches, geometry_triangle &out) {
+    geometry_triangle vor;
     triangulate((char *) switches.c_str(), &_meta, &out._meta, &vor._meta);
     out.setProperty();
 }
 
 
-void geometry::refine(std::string switches, geometry &out) {
-    geometry vor;
+void geometry_triangle::refine(std::string switches, geometry_triangle &out) {
+    geometry_triangle vor;
     triangulate((char *) switches.c_str(), &_meta, &out._meta, &vor._meta);
     out.setProperty();
 }
 
-scalar_t geometry::getX(int index) {
+scalar_t geometry_triangle::getX(int index) {
     assert(index >= 0 && index < numberofpoints);
     return this->_meta.pointlist[2 * index];
 }
 
-scalar_t geometry::getY(int index) {
+scalar_t geometry_triangle::getY(int index) {
     assert(index >= 0 && index < numberofpoints);
     return this->_meta.pointlist[2 * index + 1];
 }
 
-scalar_t geometry::getArea(int index) {
+scalar_t geometry_triangle::getArea(int index) {
     int u = this->_meta.trianglelist[3 * index];
     int v = this->_meta.trianglelist[3 * index + 1];
     int w = this->_meta.trianglelist[3 * index + 2];
 
-    scalar_t det = fabs((this->_meta.pointlist[2 * v] - this->_meta.pointlist[2 * u]) *
-                        (this->_meta.pointlist[2 * w + 1] - this->_meta.pointlist[2 * u + 1]) -
+    scalar_t det = ((this->_meta.pointlist[2 * v] - this->_meta.pointlist[2 * u]) *
+                    (this->_meta.pointlist[2 * w + 1] - this->_meta.pointlist[2 * u + 1]) -
                         (this->_meta.pointlist[2 * v + 1] - this->_meta.pointlist[2 * u + 1]) *
                         (this->_meta.pointlist[2 * w] - this->_meta.pointlist[2 * u]));
+
+    assert(det > 0);
 
     return det / 2.0;
 }
 
-int geometry::getTriangle(int index) {
+int geometry_triangle::getTriangle(int index) {
     return this->_meta.trianglelist[index];
 }
 
 
-scalar_t geometry::getDistance(int fromIndex, int toIndex) {
+scalar_t geometry_triangle::getDistance(int fromIndex, int toIndex) {
     return sqrt(SQR(getX(fromIndex) - getX(toIndex) + SQR(getY(fromIndex) - getY(toIndex))));
 }
 
-void geometry::getNearField(vector<vector<int>> &near) {
+void geometry_triangle::getNearField(vector<vector<int>> &near) {
     near.clear();
     near.resize((unsigned long) numberoftriangles);
     assert(this->_meta.neighborlist != nullptr);
@@ -187,7 +189,7 @@ void geometry::getNearField(vector<vector<int>> &near) {
 
 }
 
-void geometry::getAllArea() {
+void geometry_triangle::getAllArea() {
     arealist.resize((unsigned long) numberoftriangles);
     for (index_t id = 0; id < numberoftriangles; ++id) {
         arealist[id] = getArea(id);
