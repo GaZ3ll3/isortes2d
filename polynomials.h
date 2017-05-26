@@ -19,5 +19,7 @@ scalar_t jacobi(int order, scalar_t alpha, scalar_t beta, scalar_t x);
 
 scalar_t koornwinder(int k, int n, scalar_t x, scalar_t y);
 
+void makeKoornwinderMatrix(Matrix &K, int N, vector<scalar_t> &x, vector<scalar_t> &y, vector<scalar_t> &w);
+
 
 #endif //ISORTES_JACOBI_POLYNOMIAL_H

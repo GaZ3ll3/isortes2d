@@ -61,6 +61,8 @@ func;\
 #endif
 
 
+#define CHUNKSIZE 80
+
 typedef int index_t;
 typedef double scalar_t;
 typedef bool bool_t;

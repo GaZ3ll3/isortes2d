@@ -43,8 +43,6 @@ public:
 
     scalar_t getY(int index);
 
-    scalar_t getArea(int index);
-
     void getAllArea();
 
     scalar_t getDistance(int fromIndex, int toIndex);
@@ -59,6 +57,8 @@ public:
 
     struct triangulateio _meta;
 private:
+    scalar_t getArea(int index);
+
     void setProperty() {
         numberofpoints = _meta.numberofpoints;
         numberoftriangles = _meta.numberoftriangles;
