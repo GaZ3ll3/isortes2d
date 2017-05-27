@@ -28,24 +28,39 @@
 #include "unit_square_mesh.h"
 #include "profiler.h"
 #include "gmres.h"
+#include "Config.h"
 
 using namespace bbfmm;
 
 extern void
 duffy_transform(int deg, vector<scalar_t> points, vector<scalar_t> &X, vector<scalar_t> &Y, vector<scalar_t> &W);
 
-int main() {
+int main(int argc, char *argv[]) {
 #ifdef RUN_OMP
     omp_set_num_threads(omp_get_max_threads());
 #endif
     // configuration.
-    int M = 64;
-    size_t qrule_tri_deg = 10;
-    size_t qrule_lin_deg = 32;
-    index_t np = 9;
 
-    scalar_t mu_t = 2.2;
-    scalar_t mu_s = 2.0;
+    if (argc <= 1) {
+        std::cout << "USE " << argv[0] << " PATH_OF_CONFIG_FILE " << std::endl;
+        exit(0);
+    }
+
+    Config cfg;
+    std::ifstream cfgFile;
+    cfgFile.open(argv[1], std::ifstream::in);
+    cfg.parse(cfgFile);
+    cfgFile.close();
+
+    cfg.print();
+
+    int M = atoi(cfg.options["M"].c_str());
+    size_t qrule_tri_deg = atoi(cfg.options["q_tri"].c_str());
+    size_t qrule_lin_deg = atoi(cfg.options["q_lin"].c_str());
+    index_t np = atoi(cfg.options["np"].c_str());
+
+    scalar_t mu_t = 5.2;
+    scalar_t mu_s = 5.0;
 
     int nRefineLevel = 2;
 
@@ -171,24 +186,26 @@ int main() {
 
 
                 for (int q = 0; q < W1.size(); ++q) {
+                    scalar_t dist = sqrt(SQR(X1[q] - quadratue_rule.points_x[I]) +
+                                         SQR(Y1[q] - quadratue_rule.points_y[I]));
                     basis(row, I) += koornwinder(n, k,
-                                                 X1[q], Y1[q]) * W1[q] /
-                                     sqrt(SQR(X1[q] - quadratue_rule.points_x[I]) +
-                                          SQR(Y1[q] - quadratue_rule.points_y[I]));
+                                                 X1[q], Y1[q]) * W1[q] / (dist);
                 }
 
+
                 for (int q = 0; q < W2.size(); ++q) {
+                    scalar_t dist = sqrt(SQR(X2[q] - quadratue_rule.points_x[I]) +
+                                         SQR(Y2[q] - quadratue_rule.points_y[I]));
                     basis(row, I) += koornwinder(n, k,
-                                                 X2[q], Y2[q]) * W2[q] /
-                                     sqrt(SQR(X2[q] - quadratue_rule.points_x[I]) +
-                                          SQR(Y2[q] - quadratue_rule.points_y[I]));
+                                                 X2[q], Y2[q]) * W2[q] / (dist);
+
                 }
 
                 for (int q = 0; q < W3.size(); ++q) {
+                    scalar_t dist = sqrt(SQR(X3[q] - quadratue_rule.points_x[I]) +
+                                         SQR(Y3[q] - quadratue_rule.points_y[I]));
                     basis(row, I) += koornwinder(n, k,
-                                                 X3[q], Y3[q]) * W3[q] /
-                                     sqrt(SQR(X3[q] - quadratue_rule.points_x[I]) +
-                                          SQR(Y3[q] - quadratue_rule.points_y[I]));
+                                                 X3[q], Y3[q]) * W3[q] / (dist);
                 }
             }
             row++;
@@ -311,7 +328,7 @@ int main() {
     auto singular_eval = [&](point &src, point &trg) {
         scalar_t dist = sqrt(SQR(src.x - trg.x) + SQR(src.y - trg.y));
         if (dist == 0.) return 0.;
-        return 1.0 / dist;
+        return (1.0) / (dist);
     };
 
 
@@ -504,12 +521,17 @@ int main() {
     Vector x(RHS.row());
     setValue(x, 0.);
     GMRES(forward_mapping, x, RHS, 20, 400, 1e-14);
+//    bicgstab(forward_mapping, x, RHS, 400, 1e-14);
 
 //    write_to_csv(source, "points.csv", " ");
 //    write_to_csv(x, "result.csv");
     for (auto sample_id : sample) {
         std::cout << std::scientific << std::setprecision(16) << x(sample_id) << std::endl;
     }
+
+    std::cout << "number of points: " << source.size() << std::endl;
+    std::cout << "triangles: " << domain->numberoftriangles << std::endl;
+
 
 
     delete (domain);
