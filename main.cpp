@@ -59,8 +59,8 @@ int main(int argc, char *argv[]) {
     size_t qrule_lin_deg = atoi(cfg.options["q_lin"].c_str());
     index_t np = atoi(cfg.options["np"].c_str());
 
-    scalar_t mu_t = 5.2;
-    scalar_t mu_s = 5.0;
+    scalar_t mu_t = 2.2;
+    scalar_t mu_s = 2.0;
 
     int nRefineLevel = 2;
 
@@ -513,7 +513,10 @@ int main(int argc, char *argv[]) {
     Vector rhs((int) source.size());
     setValue(rhs, 0.);
     for (int i = 0; i < rhs.row(); ++i) {
-        rhs(i) = 1.0;
+        scalar_t d = sqrt(SQR(source[i].x - 0.6) + SQR(source[i].y - 0.4));
+        if (fabs(d - 0.2) <= 0.05) {
+            rhs(i) = (cos((d - 0.2) * M_PI / 0.05) + 1.0) / 2.0;
+        }
     }
 
 

@@ -1,8 +1,7 @@
 M = 16
 q_tri = 20
-q_lin = 32
-np = 4
-
+q_lin = 64
+np = 9
 
 
 
