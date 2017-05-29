@@ -55,8 +55,8 @@ int main(int argc, char *argv[]) {
     cfg.print();
 
     int M = atoi(cfg.options["M"].c_str());
-    size_t qrule_tri_deg = atoi(cfg.options["q_tri"].c_str());
-    size_t qrule_lin_deg = atoi(cfg.options["q_lin"].c_str());
+    int qrule_tri_deg = atoi(cfg.options["q_tri"].c_str());
+    int qrule_lin_deg = atoi(cfg.options["q_lin"].c_str());
     index_t np = atoi(cfg.options["np"].c_str());
 
     scalar_t mu_t = 2.2;
@@ -64,6 +64,15 @@ int main(int argc, char *argv[]) {
 
     int nRefineLevel = 2;
 
+
+    auto source_function = [&](scalar_t x, scalar_t y) {
+        scalar_t d = sqrt(SQR(x - 0.6) + SQR(y - 0.4));
+        if (fabs(d - 0.2) <= 0.05) {
+            return (cos((d - 0.2) * M_PI / 0.05) + 1.0) / 2.0;
+        } else {
+            return 0.;
+        }
+    };
 
     vector<int> sample(8);
 
@@ -93,7 +102,7 @@ int main(int argc, char *argv[]) {
      */
     prof.tic("quadrature rule");
     QRule_tri quadratue_rule;
-    get_vr_data(qrule_tri_deg, quadratue_rule);
+    get_vr_data((size_t) qrule_tri_deg, quadratue_rule);
     affine(quadratue_rule);
     assert(quadratue_rule.weights.size() > 0);
     prof.toc();
@@ -513,12 +522,8 @@ int main(int argc, char *argv[]) {
     Vector rhs((int) source.size());
     setValue(rhs, 0.);
     for (int i = 0; i < rhs.row(); ++i) {
-        scalar_t d = sqrt(SQR(source[i].x - 0.6) + SQR(source[i].y - 0.4));
-        if (fabs(d - 0.2) <= 0.05) {
-            rhs(i) = (cos((d - 0.2) * M_PI / 0.05) + 1.0) / 2.0;
-        }
+        rhs(i) = source_function(source[i].x, source[i].y);
     }
-
 
     Vector RHS = apply_integral(rhs);
     Vector x(RHS.row());
