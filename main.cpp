@@ -29,6 +29,8 @@
 #include "profiler.h"
 #include "gmres.h"
 #include "Config.h"
+#include "bicgstab.h"
+#include "matlab_io.h"
 
 using namespace bbfmm;
 
@@ -523,11 +525,20 @@ int main(int argc, char *argv[]) {
     Vector RHS = apply_integral(rhs);
     Vector x(RHS.row());
     setValue(x, 0.);
-    GMRES(forward_mapping, x, RHS, 20, 400, 1e-14);
-//    bicgstab(forward_mapping, x, RHS, 400, 1e-14);
 
-//    write_to_csv(source, "points.csv", " ");
-//    write_to_csv(x, "result.csv");
+
+    if (strcmp(cfg.options["Krylov"].c_str(), "GMRES") == 0) {
+        GMRES(forward_mapping, x, RHS, 20, 400, 1e-14);
+    } else {
+        bicgstab(forward_mapping, x, RHS, 400, 1e-14);
+    }
+
+    if (atoi(cfg.options["IO"].c_str())) {
+        write_to_csv(source, "points.csv", " ");
+        write_to_csv(x, "result.csv");
+    }
+
+
     for (auto sample_id : sample) {
         std::cout << std::scientific << std::setprecision(16) << x(sample_id) << std::endl;
     }

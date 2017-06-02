@@ -25,7 +25,7 @@ void write_to_csv(bbfmm::Vector data, std::string filename) {
     std::ofstream outfile;
     outfile.open(filename);
     for (int id = 0; id < data.row(); ++id) {
-        outfile << data(id) << "\n";
+        outfile << std::scientific << std::setprecision(32) << std::setw(32) << data(id) << "\n";
     }
     outfile.close();
 }
@@ -34,7 +34,8 @@ void write_to_csv(vector<point> data, std::string filename, std::string sep = " 
     std::ofstream outfile;
     outfile.open(filename);
     for (auto it : data) {
-        outfile << it.x << sep << it.y << "\n";
+        outfile << std::scientific << std::setprecision(32) << std::setw(32) << it.x << sep << std::setw(32) << it.y
+                << "\n";
     }
     outfile.close();
 }
