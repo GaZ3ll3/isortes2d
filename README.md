@@ -12,3 +12,6 @@
 
 ### run
 - ``./isortes ../data.txt``
+
+### License
+- LGPL3 license

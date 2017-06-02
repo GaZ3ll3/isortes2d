@@ -1,9 +1,10 @@
 /*
- * bicgstab.h
+ * BiCGStab subroutine.
  *
- *  Created on: Oct 9, 2016
- *      Author: Yimin Zhong
+ * copyright@ Yimin Zhong. yzhong@math.utexas.edu. All Rights Reserved.
+ *
  */
+
 
 #ifndef BICGSTAB_H
 #define BICGSTAB_H

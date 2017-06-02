@@ -1,7 +1,10 @@
-//
-// Created by lurker on 5/12/17.
-//
-
+/*
+ *
+ * 1d and 2d (triangle) quadrature rule subroutine.
+ *
+ * copyright@ Yimin Zhong. yzhong@math.utexas.edu. All Rights Reserved.
+ *
+ */
 #ifndef MODES_H
 #define MODES_H
 

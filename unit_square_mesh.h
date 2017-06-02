@@ -1,7 +1,9 @@
-//
-// Created by lurker on 5/24/17.
-//
-
+/*
+ * generate triangle mesh for unit square.
+ *
+ * copyright@ Yimin Zhong. yzhong@math.utexas.edu. All Rights Reserved.
+ *
+ */
 #include "utils.h"
 #include "geometry_triangle.h"
 

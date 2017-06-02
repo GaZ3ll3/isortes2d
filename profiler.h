@@ -1,9 +1,12 @@
-//
-// Created by lurker on 5/24/17.
-//
+/*
+ * a naive profiler subrouinte.
+ *
+ * copyright@ Yimin Zhong. yzhong@math.utexas.edu. All Rights Reserved.
+ *
+ */
 
-#ifndef ISORTES_PROFILER_H
-#define ISORTES_PROFILER_H
+#ifndef PROFILER_H
+#define PROFILER_H
 
 #include <stack>
 #include "utils.h"
@@ -19,11 +22,12 @@ public:
     ~profiler() {
         // display all time table.
         for (auto kv : _timing_set) {
-            std::cout << std::fixed << std::setprecision(3) << std::setw(30) << kv.first << std::setw(15)
+            std::cout << std::fixed << std::setprecision(3) << std::setw(30) << kv.first
+                      << (_timing_tag[kv.first] ? "[C]" : "[U]") << std::setw(15)
                       << kv.second / _total_time * 100 << "%" << std::setw(15) << kv.second << " seconds" << std::endl;
         }
 
-        std::cout << std::setw(30) << "counted time" << std::setw(31) << _total_time << " seconds" << std::endl;
+        std::cout << std::setw(30) << "counted time" << std::setw(34) << _total_time << " seconds" << std::endl;
     }
 
     void tic(std::string s = "") {
@@ -36,6 +40,7 @@ public:
             _timing_set[cur_task] = 0.;
         }
 
+        _timing_tag[cur_task] = false;
         _begin = std::chrono::steady_clock::now();
     }
 
@@ -47,6 +52,7 @@ public:
         _timing_set[cur_task] += local_time;
         if (count) {
             _total_time += local_time;
+            _timing_tag[cur_task] = true;
         }
     }
 
@@ -59,7 +65,7 @@ private:
     std::string cur_task;
 
     unordered_map<std::string, scalar_t> _timing_set;
-    unordered_map<std::string, int> _timing_tag;
+    unordered_map<std::string, bool> _timing_tag;
 };
 
 

@@ -1,7 +1,13 @@
-//
-// Created by lurker on 5/12/17.
-//
-
+/*
+ * Quadrature and discretization for triangle in 2D.
+ *
+ * copyright@ Yimin Zhong <yzhong@math.utexas.edu>. All Rights Reserved.
+ *
+ *
+ *  1. volumetric discretization with triangle cells.
+ *  2. high order quadrature rules. (Rokhlin or Gimbatus).
+ *
+ */
 #include "geometry_triangle.h"
 
 geometry_triangle::geometry_triangle() {

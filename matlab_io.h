@@ -1,11 +1,14 @@
-//
-// Created by lurker on 5/26/17.
-//
+/*
+ * output csv subroutine.
+ *
+ * copyright@ Yimin Zhong. yzhong@math.utexas.edu.
+ */
 
 #ifndef MATLAB_IO_H
 #define MATLAB_IO_H
 
 #include "utils.h"
+#include "bbfmm.h"
 #include "linalg.h"
 
 void write_to_csv(vector<scalar_t> data, std::string filename) {

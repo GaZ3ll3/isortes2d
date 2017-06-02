@@ -1,6 +1,11 @@
-//
-// Created by lurker on 5/27/17.
-//
+/*
+ * BiCGStab subroutine.
+ *
+ * copyright@ Yimin Zhong. yzhong@math.utexas.edu. All Rights Reserved.
+ *
+ */
+
+
 
 #include "bicgstab.h"
 

@@ -1,7 +1,9 @@
-//
-// Created by lurker on 5/14/17.
-//
-
+/*
+ * Koornwinder polynomial evaluation
+ *
+ * copyright@ Yimin Zhong. yzhong@math.utexas.edu. All Rights Reserved.
+ *
+ */
 #ifndef POLYNOMIAL_H
 #define POLYNOMIAL_H
 

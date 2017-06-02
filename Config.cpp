@@ -1,6 +1,9 @@
-//
-// Created by lurker on 5/27/17.
-//
+/*
+ * configuration input subroutine.
+ *
+ * copyright@ Yimin Zhong. yzhong@math.utexas.edu. All Rights Reserved.
+ *
+ */
 
 #include "Config.h"
 
