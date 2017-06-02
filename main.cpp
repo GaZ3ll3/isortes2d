@@ -172,69 +172,64 @@ int main(int argc, char *argv[]) {
 
 
     vector<scalar_t> X1, Y1, W1, X2, Y2, W2, X3, Y3, W3;
-    int row = 0;
+
 
 
     Matrix basis(coarseQuadratureSize, coarseQuadratureSize);
     setValue(basis, 0.);
 
-
-    prof.tic("singular precomputing");
-    for (int n = 0; n <= nC; ++n) {
-        for (int k = 0; k <= n; ++k) {
-            for (int I = 0; I < coarseQuadratureSize; ++I) {
-                duffy_transform(qrule_lin_deg, {quadratue_rule.points_x[I], quadratue_rule.points_y[I], 0, 1, 0, 0}, X1,
-                                Y1,
-                                W1);
-                duffy_transform(qrule_lin_deg, {quadratue_rule.points_x[I], quadratue_rule.points_y[I], 1, 0, 0, 1}, X2,
-                                Y2,
-                                W2);
-                duffy_transform(qrule_lin_deg, {quadratue_rule.points_x[I], quadratue_rule.points_y[I], 0, 0, 1, 0}, X3,
-                                Y3,
-                                W3);
-
-
-                for (int q = 0; q < W1.size(); ++q) {
-                    scalar_t dist = sqrt(SQR(X1[q] - quadratue_rule.points_x[I]) +
-                                         SQR(Y1[q] - quadratue_rule.points_y[I]));
-                    basis(row, I) += koornwinder(n, k,
-                                                 X1[q], Y1[q]) * W1[q] / (dist);
-                }
-
-
-                for (int q = 0; q < W2.size(); ++q) {
-                    scalar_t dist = sqrt(SQR(X2[q] - quadratue_rule.points_x[I]) +
-                                         SQR(Y2[q] - quadratue_rule.points_y[I]));
-                    basis(row, I) += koornwinder(n, k,
-                                                 X2[q], Y2[q]) * W2[q] / (dist);
-
-                }
-
-                for (int q = 0; q < W3.size(); ++q) {
-                    scalar_t dist = sqrt(SQR(X3[q] - quadratue_rule.points_x[I]) +
-                                         SQR(Y3[q] - quadratue_rule.points_y[I]));
-                    basis(row, I) += koornwinder(n, k,
-                                                 X3[q], Y3[q]) * W3[q] / (dist);
-                }
-            }
-            row++;
-        }
-    }
     vector<scalar_t> norm_of_koornwinder(quadratue_rule.weights.size());
 
-    row = 0;
-    for (int n = 0; n <= nC; ++n) {
-        for (int k = 0; k <= n; ++k) {
-            for (int I = 0; I < quadratue_rule.weights.size(); ++I) {
-                norm_of_koornwinder[row] += SQR(
-                        koornwinder(n, k, quadratue_rule.points_x[I], quadratue_rule.points_y[I]) *
-                        sqrt(quadratue_rule.weights[I]));
+
+    prof.tic("singular precomputing");
+#pragma omp parallel for num_threads(omp_get_max_threads()) private(X1, X2, X3, Y1, Y2, Y3, W1, W2, W3)
+    for (int row = 0; row <= nC * (nC + 3) / 2; ++row) {
+        int n = int(sqrt(2 * row + 0.25) - 0.5);
+        int k = row - (n + 1) * n / 2;
+        for (int I = 0; I < coarseQuadratureSize; ++I) {
+            norm_of_koornwinder[row] += SQR(
+                    koornwinder(n, k, quadratue_rule.points_x[I], quadratue_rule.points_y[I]) *
+                    sqrt(quadratue_rule.weights[I]));
+
+
+            duffy_transform(qrule_lin_deg, {quadratue_rule.points_x[I], quadratue_rule.points_y[I], 0, 1, 0, 0}, X1,
+                            Y1,
+                            W1);
+            duffy_transform(qrule_lin_deg, {quadratue_rule.points_x[I], quadratue_rule.points_y[I], 1, 0, 0, 1}, X2,
+                            Y2,
+                            W2);
+            duffy_transform(qrule_lin_deg, {quadratue_rule.points_x[I], quadratue_rule.points_y[I], 0, 0, 1, 0}, X3,
+                            Y3,
+                            W3);
+
+
+            for (int q = 0; q < W1.size(); ++q) {
+                scalar_t dist = sqrt(SQR(X1[q] - quadratue_rule.points_x[I]) +
+                                     SQR(Y1[q] - quadratue_rule.points_y[I]));
+                basis(row, I) += koornwinder(n, k,
+                                             X1[q], Y1[q]) * W1[q] / (dist);
             }
-            norm_of_koornwinder[row] = sqrt(norm_of_koornwinder[row]);
-            row++;
+
+
+            for (int q = 0; q < W2.size(); ++q) {
+                scalar_t dist = sqrt(SQR(X2[q] - quadratue_rule.points_x[I]) +
+                                     SQR(Y2[q] - quadratue_rule.points_y[I]));
+                basis(row, I) += koornwinder(n, k,
+                                             X2[q], Y2[q]) * W2[q] / (dist);
+
+            }
+
+            for (int q = 0; q < W3.size(); ++q) {
+                scalar_t dist = sqrt(SQR(X3[q] - quadratue_rule.points_x[I]) +
+                                     SQR(Y3[q] - quadratue_rule.points_y[I]));
+                basis(row, I) += koornwinder(n, k,
+                                             X3[q], Y3[q]) * W3[q] / (dist);
+            }
         }
+        norm_of_koornwinder[row] = sqrt(norm_of_koornwinder[row]);
     }
 
+#pragma omp parallel for collapse(2)
     for (int _row = 0; _row < basis.row(); ++_row) {
         for (int _col = 0; _col < basis.col(); ++_col) {
             basis(_row, _col) /= norm_of_koornwinder[_row];
