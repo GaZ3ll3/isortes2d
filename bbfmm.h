@@ -543,7 +543,6 @@ namespace bbfmm {
             node &n = t.dict[rootId];
             Matrix K;
 
-            Vector temp;
             if (n.parent != -1) {
                 /*
                  * V list
