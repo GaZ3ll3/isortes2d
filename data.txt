@@ -1,9 +1,9 @@
 M = 8
 q_tri = 20
 q_lin = 64
-np = 9
+np = 15
 Krylov = GMRES
-IO = 1
+IO = 0
 
 
 
