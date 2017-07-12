@@ -209,7 +209,7 @@ int main(int argc, char *argv[]) {
                 scalar_t dist = sqrt(SQR(X1[q] - quadratue_rule.points_x[I]) +
                                      SQR(Y1[q] - quadratue_rule.points_y[I]));
                 basis(row, I) += koornwinder(n, k,
-                                             X1[q], Y1[q]) * W1[q] * (cosh(dist * mu_t / M)) / (dist);
+                                             X1[q], Y1[q]) * W1[q] / (dist);
             }
 
 
@@ -217,7 +217,7 @@ int main(int argc, char *argv[]) {
                 scalar_t dist = sqrt(SQR(X2[q] - quadratue_rule.points_x[I]) +
                                      SQR(Y2[q] - quadratue_rule.points_y[I]));
                 basis(row, I) += koornwinder(n, k,
-                                             X2[q], Y2[q]) * W2[q] * (cosh(dist * mu_t / M)) / (dist);
+                                             X2[q], Y2[q]) * W2[q] / (dist);
 
             }
 
@@ -225,7 +225,7 @@ int main(int argc, char *argv[]) {
                 scalar_t dist = sqrt(SQR(X3[q] - quadratue_rule.points_x[I]) +
                                      SQR(Y3[q] - quadratue_rule.points_y[I]));
                 basis(row, I) += koornwinder(n, k,
-                                             X3[q], Y3[q]) * W3[q] * (cosh(dist * mu_t / M)) / (dist);
+                                             X3[q], Y3[q]) * W3[q] / (dist);
             }
         }
         norm_of_koornwinder[row] = sqrt(norm_of_koornwinder[row]);
@@ -326,7 +326,7 @@ int main(int argc, char *argv[]) {
         scalar_t dist = sqrt(SQR(src.x - trg.x) + SQR(src.y - trg.y));
         if (dist == 0.) return -mu_t;
         else {
-            return -sinh(mu_t * dist) / (dist);
+            return (exp(-mu_t * dist) - 1.0) / (dist);
         }
     };
 
@@ -334,7 +334,7 @@ int main(int argc, char *argv[]) {
     auto singular_eval = [&](point &src, point &trg) {
         scalar_t dist = sqrt(SQR(src.x - trg.x) + SQR(src.y - trg.y));
         if (dist == 0.) return 0.;
-        return (cosh(mu_t * dist)) / (dist);
+        return (1.0) / (dist);
     };
 
 
